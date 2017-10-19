@@ -54,19 +54,58 @@ RUN git clone https://github.com/rakshasa/rtorrent \
 	&& ./configure --prefix=$OUTPUT_DIR --enable-static --disable-shared --with-xmlrpc-c \
 	&& make -j2
 
-FROM alpine:3.5
+RUN git clone https://github.com/Novik/ruTorrent.git /tmp/rutorrent
 
+FROM alpine:3.6
+
+# s6 overlay
+RUN apk add --no-cache curl \
+	&& curl -L -s https://github.com/just-containers/s6-overlay/releases/download/v1.21.1.0/s6-overlay-amd64.tar.gz \
+		| tar xvzf - -C /
+
+# Install rTorrent dependencies
 RUN apk add --no-cache \
 		ncurses \
 		libcurl \
 		zlib \
 		libstdc++ \
 		libgcc \
-		openssl-dev
+		openssl-dev \
 
 COPY --from=build /out /out
 COPY --from=build /tmp/rtorrent/src/rtorrent /usr/local/bin/rtorrent
 
 ENV LD_LIBRARY_PATH /out/lib
+
+# Install ruTorrent dependencies
+RUN apk add --no-cache \
+		nginx \
+		ca-certificates \
+		fcgi \
+		ffmpeg \
+		geoip \
+		gzip \
+		nginx \
+		php7 \
+		php7-cgi \
+		php7-fpm \
+		php7-json  \
+		php7-mbstring \
+		php7-pear \
+		tar \
+		unrar \
+		unzip \
+		wget \
+		zip
+RUN apk add --no-cache \
+	--repository http://nl.alpinelinux.org/alpine/edge/testing \
+	mediainfo
+
+COPY --from=build /tmp/rutorrent/ /var/www/html
+COPY rutorrent.conf /etc/nginx/conf.d/rutorrent.conf
+
+RUN chown -R www-data:www-data /var/www/html
+
+COPY root/ /
 
 ENTRYPOINT ["/usr/local/bin/rtorrent"]
