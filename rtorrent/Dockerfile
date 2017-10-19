@@ -70,7 +70,7 @@ RUN apk add --no-cache \
 		zlib \
 		libstdc++ \
 		libgcc \
-		openssl-dev \
+		openssl-dev
 
 COPY --from=build /out /out
 COPY --from=build /tmp/rtorrent/src/rtorrent /usr/local/bin/rtorrent
