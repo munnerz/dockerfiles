@@ -1,2 +1,4 @@
-#!/bin/sh
+#!/usr/bin/execlineb -P
+s6-setuidgid nginx
+
 exec /usr/sbin/php-fpm7 -F

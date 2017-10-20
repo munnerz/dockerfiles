@@ -1,5 +1,6 @@
 #!/bin/sh
 
+export LD_LIBRARY_PATH=/out/lib
 exec /usr/local/bin/rtorrent \
 		-o import=/config/.rtorrent.rc \
 		-o port_range=10001-10001 \

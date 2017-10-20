@@ -104,8 +104,12 @@ RUN apk add --no-cache \
 COPY --from=build /tmp/rutorrent/ /var/www/html
 COPY rutorrent.conf /etc/nginx/conf.d/rutorrent.conf
 
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R nginx:nginx /var/www/html /var/log/php7 \
+	&& rm -f /etc/nginx/conf.d/default.conf \
+	&& mkdir -p /run/nginx
+
+VOLUME /session
 
 COPY root/ /
 
-ENTRYPOINT ["/usr/local/bin/rtorrent"]
+ENTRYPOINT ["/init"]
